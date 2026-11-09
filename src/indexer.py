@@ -96,10 +96,13 @@ def get_canonical_lsc_landmarks(class_name: str, variation_idx: int = 0) -> np.n
         set_finger(13, 'CURLED', 0.02)
         set_finger(17, 'CURLED', 0.04)
     elif class_name == '3':
-        set_finger(1, 'WIDE_5', 0, is_thumb=True)
-        set_finger(5, 'EXTENDED', -0.04)
-        set_finger(9, 'EXTENDED', +0.02)
-        set_finger(13, 'CURLED', 0.02)
+        # '3' en LSC: Dedos índice, medio y anular extendidos hacia arriba;
+        # el meñique permanece recogido y el pulgar lo sujeta contra la palma
+        v_mod = (variation_idx % 4) * 0.003
+        set_finger(1, 'FOLD_NORMAL', 0, is_thumb=True)
+        set_finger(5, 'EXTENDED', -0.05 + v_mod)
+        set_finger(9, 'EXTENDED', 0.0 + v_mod)
+        set_finger(13, 'EXTENDED', +0.05 + v_mod)
         set_finger(17, 'CURLED', 0.04)
     elif class_name == '4':
         set_finger(1, 'FOLD_NORMAL', 0, is_thumb=True)
@@ -138,12 +141,38 @@ def get_canonical_lsc_landmarks(class_name: str, variation_idx: int = 0) -> np.n
         set_finger(13, 'TOUCH_O', 0.03)
         set_finger(17, 'TOUCH_O', 0.05)
     elif class_name == 'U':
+        # 'U' en LSC: Dedos índice y meñique extendidos hacia arriba ("haciendo cachos" / vaca)
+        # Medio y anular recogidos en puño contra la palma, sujetos por el pulgar
+        v_mod = (variation_idx % 4) * 0.003
         set_finger(1, 'FOLD_NORMAL', 0, is_thumb=True)
-        set_finger(5, 'EXTENDED', -0.01) # Indice y medio juntos
-        set_finger(9, 'EXTENDED', +0.01)
+        set_finger(5, 'EXTENDED', -0.04 + v_mod)
+        set_finger(9, 'CURLED', 0.0)
         set_finger(13, 'CURLED', 0.02)
-        set_finger(17, 'CURLED', 0.04)
+        set_finger(17, 'EXTENDED', +0.06 + v_mod)
     return pts
+
+def generate_cheatsheet_overview(thumbs_dir: str, out_path: str):
+    """Genera la imagen combinada del Cheatsheet (docs/assets/lsc_cheatsheet.png) con las 11 señas."""
+    sheet = np.full((200, 600, 3), 22, dtype=np.uint8)
+    row1 = ['0', '1', '2', '3', '4', '5']
+    for i, c in enumerate(row1):
+        p = os.path.join(thumbs_dir, f"{c}.png")
+        if os.path.exists(p):
+            t = cv2.imread(p)
+            t = cv2.resize(t, (96, 96))
+            x = 3 + i * 100
+            sheet[2:98, x:x+96] = t
+    row2 = ['A', 'E', 'I', 'O', 'U']
+    for i, c in enumerate(row2):
+        p = os.path.join(thumbs_dir, f"{c}.png")
+        if os.path.exists(p):
+            t = cv2.imread(p)
+            t = cv2.resize(t, (96, 96))
+            x = 53 + i * 100
+            sheet[102:198, x:x+96] = t
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    cv2.imwrite(out_path, sheet)
+    print(f"[INDEXER] Cheatsheet panorámico guardado en: {out_path}")
 
 def create_cheatsheet_thumbnail(class_name: str, out_path: str, sample_img: np.ndarray = None):
     canvas = np.full((140, 140, 3), 25, dtype=np.uint8)
@@ -295,6 +324,9 @@ def build_or_load_index(project_root: str, force_rebuild: bool = False):
     }
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f)
+
+    overview_path = os.path.join(project_root, "docs", "assets", "lsc_cheatsheet.png")
+    generate_cheatsheet_overview(thumbs_dir, overview_path)
 
     print(f"[INDEXER] Índice listo: {features_arr.shape[0]} vectores de {FEATURE_DIM} floats en {meta['build_time_sec']} s.")
     return features_arr, labels_arr, meta

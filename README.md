@@ -194,14 +194,14 @@ El juego incluye un mapa canónico visual de las 11 señas oficiales de la Lengu
 | **0** | Número | Pulgar e índice curvados formando un óvalo vertical alargado. |
 | **1** | Número | Índice extendido hacia arriba; medio, anular y meñique recogidos. |
 | **2** | Número | Índice y medio extendidos en 'V'; pulgar cruzado sobre anular y meñique. |
-| **3** | Número | Pulgar, índice y medio extendidos hacia afuera. |
+| **3** | Número | Índice, medio y anular extendidos hacia arriba; meñique recogido y pulgar cruzado sobre él. |
 | **4** | Número | Los 4 dedos (índice a meñique) extendidos; pulgar doblado sobre la palma. |
 | **5** | Número | Mano completamente abierta con los 5 dedos extendidos y separados. |
 | **A** | Vocal | Puño cerrado con el pulgar vertical extendido contra el lateral del índice. |
 | **E** | Vocal | 4 dedos flexionados en garra sobre la palma; pulgar doblado horizontalmente debajo. |
 | **I** | Vocal | Puño cerrado con únicamente el dedo meñique extendido hacia arriba. |
 | **O** | Vocal | Todos los dedos curvados hacia abajo tocando la yema del pulgar en anillo cerrado. |
-| **U** | Vocal | Índice y medio juntos apuntando verticalmente; demás dedos recogidos. |
+| **U** | Vocal | Dedos índice y meñique extendidos hacia arriba ('cachos' / vaca); medio y anular recogidos contra la palma bajo el pulgar. |
 
 ---
 
