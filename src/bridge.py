@@ -67,6 +67,7 @@ class ParallelEngineBridge:
         self.lib.run_benchmark_amdahl.restype = None
 
     def search(self, dataset: np.ndarray, labels: np.ndarray, query: np.ndarray, num_threads: int = 8, datarace_mode: bool = False):
+        query = np.ascontiguousarray(query, dtype=np.float32)
         num_samples, dimensions = dataset.shape
         num_classes = 11
 

@@ -69,6 +69,7 @@ class DefuseDataRaceGame:
         self.cached_query_vec = None
         self.cached_hand_crop = None
         self.cached_annotated = None
+        self.cached_search_result = None
 
         self.reset_game()
 
@@ -76,6 +77,8 @@ class DefuseDataRaceGame:
         new_idx = self.cam_stream.switch_camera()
         self.camera_index = new_idx
         self.cached_annotated = None
+        self.cached_query_vec = None
+        self.cached_search_result = None
         print(f"[CAMARA] Alternando a cámara #{new_idx}...")
 
     def toggle_game_mode(self):
@@ -202,6 +205,15 @@ class DefuseDataRaceGame:
                     self.cached_query_vec = query_vec
                     self.cached_hand_crop = hand_crop
                     self.cached_annotated = annotated_cam
+
+                    if query_vec is not None:
+                        self.cached_search_result = self.bridge.search(
+                            self.dataset, self.labels, query_vec,
+                            num_threads=self.num_threads,
+                            datarace_mode=self.datarace_mode
+                        )
+                    else:
+                        self.cached_search_result = None
                 else:
                     query_vec = self.cached_query_vec
                     hand_crop = self.cached_hand_crop
@@ -213,19 +225,24 @@ class DefuseDataRaceGame:
                 pts = get_canonical_lsc_landmarks(self.simulated_class)
                 dummy_crop = np.full((64, 64, 3), 40 + CLASS_NAMES.index(self.simulated_class) * 15, dtype=np.uint8)
                 query_vec = HandFeatureExtractor.build_feature_vector(pts, dummy_crop, 0.0)
-                is_simulated = True
-
-            search_result = None
-            if query_vec is not None:
                 search_result = self.bridge.search(
                     self.dataset, self.labels, query_vec,
                     num_threads=self.num_threads,
                     datarace_mode=self.datarace_mode
                 )
+                is_simulated = True
+            else:
+                search_result = self.cached_search_result
 
-                # Ponderación calibrada para seña 'E' con mano derecha
+            # Ponderación calibrada para seña 'E' con mano derecha
+            if search_result is not None:
                 e_idx = CLASS_NAMES.index('E')
-                if self.game_state == "PLAYING" and self.target_code[self.current_lock_idx] == 'E':
+                is_target_e = (
+                    self.game_state == "PLAYING" and
+                    self.current_lock_idx < len(self.target_code) and
+                    self.target_code[self.current_lock_idx] == 'E'
+                )
+                if is_target_e:
                     search_result["class_scores"][e_idx] += 0.055
                 else:
                     search_result["class_scores"][e_idx] += 0.035
@@ -243,7 +260,9 @@ class DefuseDataRaceGame:
                 self.sound.play("explosion")
 
             hold_progress = 0.0
-            if self.game_state == "PLAYING" and search_result is not None:
+            if (self.game_state == "PLAYING" and 
+                self.current_lock_idx < len(self.target_code) and 
+                search_result is not None):
                 detected_name = CLASS_NAMES[search_result["best_class"]]
                 target_name = self.target_code[self.current_lock_idx]
                 score_val = search_result["best_score"]
@@ -336,12 +355,13 @@ class DefuseDataRaceGame:
                     else:
                         self.sound.play("unlock")
             elif key == ord('s') or key == ord('S'):
-                if self.game_state == "PLAYING":
+                if self.game_state == "PLAYING" and self.current_lock_idx < len(self.target_code):
                     self.simulated_class = self.target_code[self.current_lock_idx]
             else:
                 self.simulated_class = None
 
         self.sound.stop_tension()
+        self.sound.close()
         if hasattr(self, "cam_stream"):
             self.cam_stream.stop()
         cv2.destroyAllWindows()
@@ -388,7 +408,7 @@ class DefuseDataRaceGame:
         cv2.rectangle(diag, (0, 360), (640, 520), (28, 28, 35), -1)
         cv2.line(diag, (0, 360), (640, 360), (0, 200, 255), 2)
 
-        target_name = self.target_code[self.current_lock_idx] if self.game_state == "PLAYING" else "-"
+        target_name = self.target_code[self.current_lock_idx] if (self.game_state == "PLAYING" and self.current_lock_idx < len(self.target_code)) else "-"
         cv2.putText(diag, f"Candado Objetivo: [{target_name}]", (15, 390),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.62, (0, 220, 255), 2, cv2.LINE_AA)
 
