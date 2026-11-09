@@ -1,0 +1,48 @@
+# ==============================================================================
+# .gitignore - Defuse the Data-Race: LSC Parallel Edition
+# ==============================================================================
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.pyo
+venv/
+.venv/
+env/
+.pytest_cache/
+
+# C++ build artifacts
+*.o
+*.obj
+*.exe
+*.exp
+*.lib
+
+# Note: src/parallel_engine.dll is tracked or compiled automatically by compile_engine.py
+
+# Large binary datasets (Auto-generated on startup by indexer.py in 0.7 seconds)
+# Excluded from git to prevent exceeding GitHub's 100 MB file size limit
+data_cache/features.bin
+data_cache/labels.bin
+
+# Raw Kaggle 24 GB image folders (optional download)
+dataset/Woman/*
+dataset/men/*
+!dataset/Woman/.gitkeep
+!dataset/men/.gitkeep
+!dataset/README.md
+
+# Operating System & IDEs
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*~
+
+# Temporary & diagnostic logs
+*.log
+scratch/
