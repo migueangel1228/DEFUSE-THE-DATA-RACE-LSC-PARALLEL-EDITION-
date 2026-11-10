@@ -280,6 +280,6 @@ El código C++ en [`src/parallel_engine.cpp`](src/parallel_engine.cpp) cumple ri
 
 * **Desarrollador:** Miguel Ángel Parra ([@Mianparo](https://github.com/Mianparo))
 * **Institución:** Pontificia Universidad Javeriana Cali
-* **Asignatura:** Computación Paralela y Distribuida
+* **Asignatura:** Programación Paralela
 * **Dataset Base:** [Hand Gesture of the Colombian Sign Language (Kaggle)](https://www.kaggle.com/datasets/evernext10/hand-gesture-of-the-colombian-sign-language) por *evernext10*.
 * **Licencia:** Este proyecto se distribuye bajo la licencia [MIT](LICENSE).
